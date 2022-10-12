@@ -59,20 +59,21 @@ sbt installM2
 sbt test
 sbt pkgServer
 sbt serv/test
-pushd serv/target/universal/
-unzip -o "*.zip"
-kill "$( lsof -i:9000 | sed -n '2p' | awk '{print $2}' )" >/dev/null 2>&1 || true
-./omega-edit-grpc-server*/bin/omega-edit-grpc-server --port=9000&
-server_pid=$!
+rm -f ../../client/ts/omega-edit-grpc-server*.zip
+cp -av serv/target/universal/omega-edit-grpc-server*.zip ../../client/ts
 popd
-popd
-pushd src/rpc/client/ts/
-npm install
-npm run compile-src
-npm run lint
-npm test
-popd
-kill $server_pid
 
+# Make sure there is no server running on port 9000
 kill -9 "$( lsof -i:9000 | sed -n '2p' | awk '{print $2}' )" >/dev/null 2>&1 || true
+
+# Build and test the TypeScript client
+pushd src/rpc/client/ts/
+yarn install
+yarn compile-src
+yarn test
+popd
+
+# Make sure there is no server running on port 9000
+kill -9 "$( lsof -i:9000 | sed -n '2p' | awk '{print $2}' )" >/dev/null 2>&1 || true
+
 echo "✔ Done! ✨"

@@ -127,7 +127,7 @@ describe('Viewports', () => {
     expect(await subscribeViewport(viewport_2_id)).to.equal(viewport_2_id)
     expect(await getViewportCount(session_id)).to.equal(2)
     console.log(viewport_callbacks)
-    await check_callback_count(viewport_callbacks, viewport_2_id, 0, 500)
+    await check_callback_count(viewport_callbacks, viewport_2_id, 0)
 
     let change_id = await insert(session_id, 0, '0123456789ABC')
     expect(change_id).to.equal(1)
@@ -141,7 +141,7 @@ describe('Viewports', () => {
     viewport_data = await getViewportData(viewport_2_id)
     expect(decode(viewport_data.getData_asU8())).to.equal('ABC')
 
-    await check_callback_count(viewport_callbacks, viewport_2_id, 1, 500)
+    await check_callback_count(viewport_callbacks, viewport_2_id, 1)
 
     change_id = await del(session_id, 0, 1) // Event 2
     expect(change_id).to.equal(2)
