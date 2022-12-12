@@ -194,6 +194,12 @@ jobs:
             mv -v ${folder}/${{ env.PKG_VERSION }}/${folder}-${{ env.PKG_VERSION }}-windows-* .
             mv -v ${folder}/${{ env.PKG_VERSION }}/${folder}-${{ env.PKG_VERSION }}-macos-* .
           done
+        
+      - name: Download omega-edit-native for M1 mac
+        run: |
+          curl \
+            https://github.com/Shanedell/omega-edit-native-m1/raw/main/omega-edit-native_2.13-${{ env.PKG_VERSION }}-macos-aarch64.jar \
+            --output omega-edit-native_2.13-${{ env.PKG_VERSION }}-macos-aarch64.jar
 
       - name: Package Scala Native 🎁
         env:

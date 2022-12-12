@@ -32,11 +32,12 @@ lazy val ghb_resolver = (
 lazy val bashExtras = s"""declare new_classpath=\"$$app_classpath\"
 declare windows_jar_file="com.ctc.omega-edit-native_2.13-${omegaVersion}-windows-${arch.arch}.jar"
 declare linux_jar_file="com.ctc.omega-edit-native_2.13-${omegaVersion}-linux-${arch.arch}.jar"
-declare macos_jar_file="com.ctc.omega-edit-native_2.13-${omegaVersion}-macos-${arch.arch}.jar"
+declare macos_jar_file="com.ctc.omega-edit-native_2.13-${omegaVersion}-macos-x64_64.jar"
+declare macos_aarch_jar_file="com.ctc.omega-edit-native_2.13-${omegaVersion}-macos-aarch64.jar"
 if [[ $$OSTYPE == "darwin"* ]]; then
   new_classpath=$$(echo $$new_classpath |\\
-    sed -e "s/$${linux_jar_file}/$${macos_jar_file}/" | \\
-    sed -e "s/$${windows_jar_file}/$${macos_jar_file}/"\\
+    sed -e "s/$${linux_jar_file}/$${macos_jar_file}:$${macos_aarch_jar_file}/" | \\
+    sed -e "s/$${windows_jar_file}/$${macos_jar_file}:$${macos_aarch_jar_file}/"\\
   )
 else
   new_classpath=$$(echo $$new_classpath |\\
