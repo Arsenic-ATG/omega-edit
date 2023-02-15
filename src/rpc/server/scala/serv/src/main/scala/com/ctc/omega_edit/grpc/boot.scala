@@ -39,7 +39,7 @@ object boot
             "interface",
             short = "i",
             metavar = "interface_str",
-            help = s"Set the gRPC interface to bind to. Default: $default_interface"
+            help = s"Set the interface to bind to. Default: $default_interface"
           )
           .withDefault(default_interface)
 
@@ -49,7 +49,7 @@ object boot
             "port",
             short = "p",
             metavar = "port_num",
-            help = s"Set the gRPC port to listen on. Default: $default_port"
+            help = s"Set the port to listen on. Default: $default_port"
           )
           .withDefault(default_port.toInt)
 
@@ -69,11 +69,11 @@ class boot(iface: String, port: Int) {
       for {
         binding <- EditorService.bind(iface = iface, port = port)
 
-        _ = println(s"gRPC server (v${v.major}.${v.minor}.${v.patch}) bound to: ${binding.localAddress}")
+        _ = println(s"OmegaEdit gRPC server (v${v.major}.${v.minor}.${v.patch}) listening on ${binding.localAddress}")
 
         done <- binding.addToCoordinatedShutdown(1.second).whenTerminated
 
-        _ = println(s"exiting...")
+        _ = println(s"OmegaEdit gRPC server exiting")
       } yield done
 
     Await.result(done, atMost = Duration.Inf)
