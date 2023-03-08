@@ -134,8 +134,10 @@ export async function startServer(
  * @returns true if the server was stopped
  */
 export function stopServerGraceful(): Promise<number> {
-  return new Promise<number>(async () => {
-    return stopServer(ServerControlKind.SERVER_CONTROL_GRACEFUL_SHUTDOWN)
+  return new Promise<number>(async (resolve, _) => {
+    return resolve(
+      stopServer(ServerControlKind.SERVER_CONTROL_GRACEFUL_SHUTDOWN)
+    )
   })
 }
 
@@ -144,8 +146,10 @@ export function stopServerGraceful(): Promise<number> {
  * @returns true if the server was stopped
  */
 export function stopServerImmediate(): Promise<number> {
-  return new Promise<number>(async () => {
-    return stopServer(ServerControlKind.SERVER_CONTROL_IMMEDIATE_SHUTDOWN)
+  return new Promise<number>(async (resolve, _) => {
+    return resolve(
+      stopServer(ServerControlKind.SERVER_CONTROL_IMMEDIATE_SHUTDOWN)
+    )
   })
 }
 
@@ -165,6 +169,29 @@ function stopServer(kind: ServerControlKind): Promise<number> {
       new ServerControlRequest().setKind(kind),
       (err, resp) => {
         if (err) {
+          if (err.message.includes('Call cancelled')) {
+            return resolve(0)
+          }
+
+          if (
+            err.message.includes('No connection established') ||
+            err.message.includes('INTERNAL:')
+          ) {
+            getLogger().debug({
+              fn: 'stopServer',
+              msg: 'API failed to stop server',
+            })
+
+            /**
+             * 0 indicates the API stopped the server,
+             * 1 indicates the API failed to stop the server, caused by either:
+             *  - No connection established to server
+             *  - There was n issue trying to connect to the server
+             */
+
+            return resolve(1)
+          }
+
           getLogger().error({
             fn: 'stopServer',
             err: {
@@ -204,7 +231,9 @@ function stopServer(kind: ServerControlKind): Promise<number> {
  * @param pid pid of the server process
  * @returns true if the server was stopped
  */
-export function stopServerUsingPID(pid: number | undefined): boolean {
+export async function stopServerUsingPID(
+  pid: number | undefined
+): Promise<boolean> {
   if (pid) {
     getLogger().debug({ fn: 'stopServerUsingPID', pid: pid })
 
