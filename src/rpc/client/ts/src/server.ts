@@ -220,6 +220,8 @@ function stopServer(kind: ServerControlKind): Promise<number> {
           stopped: true,
         })
 
+        fs.writeFileSync('here2', 'HERE 4')
+
         return resolve(resp.getResponseCode())
       }
     )

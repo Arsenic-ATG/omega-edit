@@ -119,22 +119,29 @@ export function saveSession(
       .setFilePath(file_path)
       .setAllowOverwrite(overwrite)
     getLogger().debug({ fn: 'saveSession', rqst: request.toObject() })
-    getClient().saveSession(request, (err, r) => {
-      if (err) {
-        getLogger().error({
-          fn: 'saveSession',
-          err: {
-            msg: err.message,
-            details: err.details,
-            code: err.code,
-            stack: err.stack,
-          },
-        })
-        return reject('saveSession error: ' + err.message)
-      }
-      getLogger().debug({ fn: 'saveSession', resp: r.toObject() })
-      return resolve(r.getFilePath())
-    })
+    getClient()
+      .saveSession(request, (err, r) => {
+        if (err) {
+          getLogger().error({
+            fn: 'saveSession',
+            err: {
+              msg: err.message,
+              details: err.details,
+              code: err.code,
+              stack: err.stack,
+            },
+          })
+          return reject('saveSession error: ' + err.message)
+        }
+        getLogger().debug({ fn: 'saveSession', resp: r.toObject() })
+        return resolve(r.getFilePath())
+      })
+      .on('error', (err) => {
+        // Call cancelled thrown when server is shutdown
+        if (!err.message.includes('Call cancelled')) {
+          throw err
+        }
+      })
   })
 }
 
