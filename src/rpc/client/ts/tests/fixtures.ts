@@ -112,7 +112,7 @@ export async function mochaGlobalTeardown(): Promise<boolean> {
     const pid = parseInt(fs.readFileSync(pidFile, 'utf8').toString())
 
     // first try to stop the server via the api
-    if ((await stopServerImmediate()) == 0) {
+    if ((await stopServerImmediate()) === 0) {
       fs.unlinkSync(pidFile)
 
       getLogger().debug({

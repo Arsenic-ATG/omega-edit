@@ -24,7 +24,12 @@ import { getLogger } from './logger'
 import { getClient } from './client'
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb'
 import * as fs from 'fs'
-import { ServerControlKind, ServerControlRequest } from './omega_edit_pb'
+import {
+  ServerControlKind,
+  ServerControlRequest,
+  ServerControlResponse,
+  VersionResponse,
+} from './omega_edit_pb'
 
 /**
  * Artifact class
@@ -167,7 +172,7 @@ function stopServer(kind: ServerControlKind): Promise<number> {
   return new Promise<number>((resolve, reject) => {
     getClient().serverControl(
       new ServerControlRequest().setKind(kind),
-      (err, resp) => {
+      (err, resp: ServerControlResponse) => {
         if (err) {
           if (err.message.includes('Call cancelled')) {
             return resolve(0)
@@ -219,8 +224,6 @@ function stopServer(kind: ServerControlKind): Promise<number> {
           kind: kind.toString(),
           stopped: true,
         })
-
-        fs.writeFileSync('here2', 'HERE 4')
 
         return resolve(resp.getResponseCode())
       }
@@ -287,7 +290,7 @@ export interface IServerHeartbeat {
 export function getServerHeartbeat(): Promise<IServerHeartbeat> {
   return new Promise<IServerHeartbeat>((resolve, reject) => {
     const startTime = Date.now()
-    getClient().getVersion(new Empty(), (err, v) => {
+    getClient().getVersion(new Empty(), (err, v: VersionResponse) => {
       if (err) {
         getLogger().error({
           fn: 'getServerHeartbeat',

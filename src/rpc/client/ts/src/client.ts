@@ -67,7 +67,7 @@ export function getClient(
           },
         })
       })
-      .then((ready) => {
+      .then((ready: boolean | void) => {
         if (!ready) {
           getLogger().error({
             cmd: 'getClient',
@@ -96,7 +96,7 @@ export function waitForReady(
     deadline.setSeconds(deadline.getSeconds() + 10)
   }
   return new Promise<boolean>((resolve, reject) => {
-    client.waitForReady(deadline as grpc.Deadline, (err) => {
+    client.waitForReady(deadline as grpc.Deadline, (err: Error | undefined) => {
       if (err) {
         getLogger().error({
           cmd: 'waitForReady',
